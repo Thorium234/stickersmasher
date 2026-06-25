@@ -1,17 +1,40 @@
-import { Text, View, StyleSheet, Pressable } from 'react-native';
-import { Link } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+
+import { useState } from 'react';
+
+
+import Button from '@/components/Button';
+import ImageViewer from '@/components/ImageViewer';
+
+const PlaceholderImage = require('@/assets/images/background-image.png');
 
 export default function Index() {
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    } else {
+      alert('You did not select any image.');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sticker Smash</Text>
-      <Text style={styles.subtitle}>Home Screen</Text>
-
-      <Link href="/about" asChild>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>Go to About Screen</Text>
-        </Pressable>
-      </Link>
+      <View style={styles.imageContainer}>
+        <ImageViewer imgSource={PlaceholderImage} selectedImage={selectedImage} />
+      </View>
+      <View style={styles.footerContainer}>
+        <Button theme="primary" label="Choose a photo" onPress={pickImageAsync} />
+        <Button label="Use this photo" />
+      </View>
     </View>
   );
 }
@@ -21,28 +44,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#25292e',
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  title: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8,
+  imageContainer: {
+    flex: 1,
   },
-  subtitle: {
-    color: '#ccc',
-    fontSize: 18,
-    marginBottom: 40,
-  },
-  button: {
-    backgroundColor: '#208AEF',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
+  footerContainer: {
+    flex: 1 / 3,
+    alignItems: 'center',
   },
 });
+
